@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  
+<head>
+<meta charset="UTF-8">
+<title>Compare Two Normal Distributions</title>
+  
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+</head>
+<body>
+	<div>
+		<nav id="navbar-example2" class="navbar navbar-dark bg-dark">
+              <a class="navbar-brand" href="#">Compare Two Normal Distributions</a>
+        </nav>
+        <div class="container">
+            <div class="row">
+                <div class="col-3 ">
+        			<table>
+                	       <thead>
+                	            <input type="submit" id="btnSubmit"  value="Submit" class="btn btn-primary btn-block">
+                                <br/>
+                            </thead>
+                            <tbody> 
+                              <tr>
+                                <td>Enter Mean Null Hypothesis: </td>
+                                <td> 
+                                  <input type="text" pattern="[0-9]*" placeholder="0" id="mean1" />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>Enter Mean Alternate Hypothesis: </td>
+                                <td> 
+                                  <input type="text" pattern="[0-9]*" placeholder="0" id="mean2"/>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>Enter Deviation Null Hypothesis: </td>
+                                <td> 
+                                  <input type="text" pattern="[0-9]*" placeholder="0" id="deviation1" />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>Enter Deviation Alternate Hypothesis: </td>
+                                <td> 
+                                  <input type="text" pattern="[0-9]*" placeholder="0" id="deviation2" />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>Number of Data Elements: </td>
+                                <td> 
+                                  <input type="text" pattern="[0-9]*" placeholder="0" id="numElements" />
+                                </td>
+                              </tr>
+                            </tbody>
+                	</table>
+                </div>
+                <div class="col-9">
+                    <canvas id="myChart" style="position: center; height:40vh; width:80vw;"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+        
+	</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!--chartjs-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+
+<script type='text/javascript'>
+
+	$(document).ready(function() {
+		$("#btnSubmit").click(function(){
+
+				var mean1 = parseFloat($('#mean1').val());
+				var mean2 = parseFloat($('#mean2').val());
+				var deviation1 = parseFloat($('#deviation1').val());
+				var deviation2 = parseFloat($('#deviation2').val());
+				var numElements = parseFloat($('#numElements').val());
+
+                var num = [];
+                for(var i = 1; i <= 30;i++){
+                    num.push(i);
+                }
+
+        var url = 'getDistribution';
+
+        $.ajax({
+            url: url,
+            data: {
+                "mean1":mean1,
+                "mean2":mean2,
+                "deviation1":deviation1,
+                "deviation2":deviation2,
+                "numElements":numElements
+            },
+            dataType: 'json',
+            success: function (data) {
+                alert("Data Rendered");
+
+                var distribution1_color = ['rgba(255,255,0)'];
+                var distribution2_color = ['rgba(255,255,0)'];
+                //purple is for the distri
+                if(data.pval > 0.05){
+                    distribution1_color = ['rgba(0,255,255)'];
+                    distribution2_color = ['rgba(255,0,176)'];
+                }else{
+                    distribution1_color = ['rgba(255,0,176)'];
+                    distribution2_color = ['rgba(0,255,255)'];
+                }
+
+                var ctx = document.getElementById("myChart").getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: num,
+                        datasets: [{
+                            label: 'Null Hypothesis',
+                            data: data.distribution1,
+                            backgroundColor: distribution1_color
+                        },{
+                            label: 'Alternate Hypothesis',
+                            data: data.distribution2,
+                            backgroundColor: distribution2_color
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero:true
+                                }
+                            }]
+                        },
+                        animation: {
+                            duration: 0, 
+                        },
+                        hover: {
+                            animationDuration: 0, 
+                        },
+                        responsiveAnimationDuration: 0, 
+                    }
+                });
+
+
+            },
+            error:function(data, textStatus, errorThrown){
+            console.log("failed server side", errorThrown);
+            }
+        })
+
+		});	   
+	});
+
+</script>
+
+
+</html>
