@@ -6,4 +6,4 @@ This is a django based website using ajax to interact with the dom to call chart
 The numbers entered by the user in the form are passed as a json to the post view function. In views.py the 
 python numpy scipy.stats libraries are used to calculate the normal distributions and determine the p-value. 
 
-![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+![Example Image](/distribution_site_example.PNG")
